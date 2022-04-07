@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<head>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>mySCADA HMI :: Overview Temp Auto</title>
+
+        <script type="text/javascript">
+            window.__MYSCADAVERSION = 1599121056593;
+        </script>
+
+        <script data-main="scripts/main" src="scripts/libs/require.min.js"></script>
+
+        <link rel="stylesheet" id="maincss" phref="css/main.css" href="css/main.css?_=1599121056593">
+        <link rel="stylesheet" id="stimulsoftcss">
+
+        <script>
+            var el = document.getElementById('maincss');
+
+            var href = el.getAttribute('phref');
+            if (window.__MYSCADAVERSION)
+                href += "?_=" + window.__MYSCADAVERSION;
+            el.setAttribute('href', href);
+        </script>
+        <link rel="stylesheet" id="colors_css" href="data/every/colors.css?_=1649303873412">
+
+
+        <style>
+            body,
+            html {
+                overflow-y: hidden;
+            }
+
+            .nav .menu_icon {
+                padding: 10px;
+            }
+        </style>
+
+
+        <style>
+            input.editor-text {
+                width: 100%;
+                height: 100%;
+                border: 0;
+                margin: 0;
+                background: transparent;
+                outline: 0;
+                padding: 0;
+            }
+        </style>
+
+        <script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="main"
+            src="scripts/main.js"></script>
+        <script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="common"
+            src="scripts/common.js?_=1599121056593"></script>
+        <style type="text/css">
+            /* Chart.js */
+            @-webkit-keyframes chartjs-render-animation {
+                from {
+                    opacity: 0.99
+                }
+
+                to {
+                    opacity: 1
+                }
+            }
+
+            @keyframes chartjs-render-animation {
+                from {
+                    opacity: 0.99
+                }
+
+                to {
+                    opacity: 1
+                }
+            }
+
+            .chartjs-render-monitor {
+                -webkit-animation: chartjs-render-animation 0.001s;
+                animation: chartjs-render-animation 0.001s;
+            }
+        </style>
+    </head>
+</head>
+
+<body>
+
+    <body class="yay-hide">
+
+
+        <script id="myNavTemplate" type="text/template">
+            <nav class="navbar navbar-default navbar-static-top bgBlue1">
+                <div class="navbar-header">
+                <button class="btn btn-default navbar-btn yay-toggle visible-xs bgWhite textBlack" type="button"><i class="fa fa-bars"></i></button>
+                  <a class="titlebox titlebox-small visible-xs textWhite" href="#" onclick="return false;"></a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    
+              <% if (views.length > 0) { %>
+                  <ul class="nav navbar-nav navbar-notitle">
+                <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><%= texts.views %><span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                <% _.each(views, function(v){ %>
+                <li><a href="#view/<%= v.key %>"><%= v.name %></a></li>
+                <% }); %>
+                </ul>
+                    </li>
+                  </ul>
+              <% } %>
+                  
+              <% if (trends.length > 0) { %>
+              <ul class="nav navbar-nav navbar-notitle">
+                <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><%= texts.trends %><span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                <% _.each(trends, function(t){ %>
+                <li><a href="#trend/<%= t.key %>"><%= t.name %></a></li>
+                <% }); %>
+                      </ul>
+                    </li>
+                  </ul>
+              <% } %>
+              <% if (showAlarms) { %>
+              <ul class="nav navbar-nav navbar-notitle">
+                <li class="dropdown">
+                      <a href="#" class="dropdown-toggle navbar-alarms-title" data-toggle="dropdown" role="button" aria-expanded="false"><%= texts.alarms_short %>&nbsp;(<span class='navbar-act-alarms' />/<span class='navbar-nonack-alarms' />)<span class="caret"></span></a>
+                      <ul class="dropdown-menu" role="menu">
+                <li class='navbar-alarms-online'><a href="#alarms/online"><span class='navbar-online-alarms' />&nbsp;<%= texts.online %></a></li>
+                <li class='navbar-alarms-act'><a href="#alarms/act">&nbsp;&nbsp;&nbsp;<span class='navbar-act-alarms' />&nbsp;<%= texts.active %></a></li>
+                <li class='navbar-alarms-nonack'><a href="#alarms/unack">&nbsp;&nbsp;&nbsp;<span class='navbar-nonack-alarms' />&nbsp;<%= texts.unacknowledged %></a></li>
+                <li><a href="#alarms/hist"><%= texts.history %></a></li>
+                </ul>
+                    </li>
+                  </ul>
+              <% } %>
+              <% if (showOther) { %>
+              <ul class="nav navbar-nav navbar-beforetitle navbar-notitle">
+        
+                  
+                <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}">...<span class="caret"></span></a>
+                      <ul class="dropdown-menu dropdown-static" role="menu">
+                <% if(dlgviews.length > 0){ %>
+                <li class="dropdown-submenu-dlg">
+                    <a class="dropdown-toggle" data-toggle="dropdown" onclick="(function(e){ $('#dlg-submenu-container').toggle(); e.stopPropagation(); })(event)"><%= texts.datalogviews %></a>
+                    <ul class="dropdown-menu" id="dlg-submenu-container" onclick="$('#dlg-submenu-container').toggle();">
+                        <% _.each(dlgviews, function(v){ %>
+                        <li><a href="#dlgview/<%= v.key %>"><%= v.name %></a></li>
+                        <% }); %>
+                    </ul>
+                </li>
+                <% } %>
+        
+                <% if(recipeviews.length > 0){ %>
+                <li class="dropdown-submenu-dlg">
+                    <a class="dropdown-toggle" data-toggle="dropdown" onclick="(function(e){ $('#recipe-submenu-container').toggle(); e.stopPropagation(); })(event)"><%= texts.recipeviews %></a>
+                    <ul class="dropdown-menu" id="recipe-submenu-container" onclick="$('#recipe-submenu-container').toggle();">
+                        <% _.each(recipeviews, function(v){ %>
+                        <li><a href="#recipe/<%= v.key %>"><%= v.name %></a></li>
+                        <% }); %>
+                    </ul>
+                </li>
+                <% } %>
+        
+                <% if(timelineviews.length > 0){ %>
+                    <li class="dropdown-submenu-dlg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" onclick="(function(e){ $('#timeline-submenu-container').toggle(); e.stopPropagation(); })(event)"><%= texts.timelineviews %></a>
+                        <ul class="dropdown-menu" id="timeline-submenu-container" onclick="$('#timeline-submenu-container').toggle();">
+                            <% _.each(timelineviews, function(v){ %>
+                            <li><a href="#timeLine/<%= v.key %>"><%= v.name %></a></li>
+                            <% }); %>
+                        </ul>
+                    </li>
+                    <% } %>
+        
+        
+                <% if (showDlg) { %>
+                  <li><a href="#dlg" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}"><%= texts.dlg %></a></li>
+                <% } %>
+                <% if(showUsrA) { %>
+                  <li><a href="#usra" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}"><%= texts.user_actions %></a></li>
+                <% } %>
+                
+                <% if(showReports) { %>
+                  <li><a href="#reports" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}"><%= texts.reports %></a></li>
+                  <li><a href="#reportsUser" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}"><%= texts.reportsUser %></a></li>
+                <% } %>
+        
+                <% if(showUsrEdit) { %>
+                  <li><a href="#editusers" onclick="if($('#dlg-submenu-container').is(':visible')) {$('#dlg-submenu-container').toggle();}"><%= texts.edit_users %></a></li>
+                <% } %>
+                </ul>
+                    </li>
+                  </ul>
+              <% } %>
+                  
+                  <div class="nav navbar-nav titlebox titlebox-big navbar-title hidden-xs"></div>
+              <% if (show_settings) { %>
+              <ul class="nav navbar-nav navbar-right navbar-notitle">
+                <li>
+                  <a href="settings/afterlogin.php" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img alt='<%= texts.settings %>' src='<%= settings_img_src %>' /></a>
+                </li>
+                  </ul>
+                <% } %>
+                <% if (show_settings_panel) { %>
+                    <ul class="nav navbar-nav navbar-right navbar-notitle">
+                        <li>
+                            <a onClick="window.open(window.location.protocol + '//' + window.location.host + window.location.pathname+'?settings=true','_self')" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img alt='<%= texts.settings %>' src='<%= settings_img_src %>' /></a>
+                        </li>
+                                </ul>
+                    <% } %>
+                    <% if (show_settings_desktop) { %>
+                    <ul class="nav navbar-nav navbar-right navbar-notitle">
+                        <li>
+                            <a onClick="window.open(window.location.protocol + '//' + window.location.host + window.location.pathname+'?settings=true','_self')" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img alt='<%= texts.settings %>' src='<%= settings_img_src %>' /></a>
+                        </li>
+                                </ul>
+                    <% } %>
+                  <ul class="nav navbar-nav navbar-right navbar-notitle">
+                <li>
+                  <a href="#" title='<%= login_img_title %>' class='menu_logged_icon menu_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img alt='<%= login_img_title %>' src='<%= login_img_src %>' /></a>
+                </li>
+                  </ul>
+              <div class="navbar-widget navbar-right navbar-notitle" style='display: inline-block; '></div>
+                </div><!--/.nav-collapse -->
+            </nav>
+        </script>
+
+        <!-- Static navbar -->
+
+        <!--
+            Yay Sidebar
+            Options [you can use all of theme classnames]:
+              .yay-hide-to-small   - no hide menu, just set it small with big icons
+              .yay-static          - stop using fixed sidebar (will scroll with content)
+              .yay-gestures        - to show and hide menu using gesture swipes
+              .yay-light           - light color scheme
+              .yay-overlap-content - hide menu on content click
+              
+            Effects [you can use one of these classnames]:
+              .yay-overlay  - overlay content
+              .yay-push     - push content to right
+              .yay-shrink   - shrink content width
+          -->
+
+        <script id="myNavSidebarTemplate" type="text/template">
+                <ul>
+        <!--          <li class="label">Menu</li>-->
+        
+              <% if (views.length > 0) { %>
+                  <li>
+                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i> <%= texts.views %><span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                    <ul>
+                <% _.each(views, function(v){ %>
+                <li><a class='yay-do-hide' href="#view/<%= v.key %>"><%= v.name %></a></li>
+                <% }); %>
+                      </li>
+                    </ul>
+                  </li>
+                  <% } %>
+        
+              <% if (trends.length > 0) { %>
+                  <li>
+                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i> <%= texts.trends %><span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                    <ul>
+                <% _.each(trends, function(t){ %>
+                <li><a class='yay-do-hide' href="#trend/<%= t.key %>"><%= t.name %></a></li>
+                <% }); %>
+                      </li>
+                    </ul>
+                  </li>
+                  <% } %>
+        
+              <% if (showAlarms) { %>
+                  <li>
+                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i><%= texts.alarms_short %>&nbsp;(<span class='navbar-act-alarms' />/<span class='navbar-nonack-alarms' />)<span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                    <ul>
+                <li class='navbar-alarms-online'><a class='yay-do-hide' href="#alarms/online"><span class='navbar-online-alarms' /><%= texts.online %></a></li>
+                <li class='navbar-alarms-act'><a class='yay-do-hide' href="#alarms/act"><span class='navbar-act-alarms' />&nbsp;&nbsp;&nbsp;<%= texts.active %></a></li>
+                <li class='navbar-alarms-nonack'><a class='yay-do-hide' href="#alarms/unack"><span class='navbar-nonack-alarms' />&nbsp;&nbsp;&nbsp;<%= texts.unacknowledged %></a></li>
+                <li><a class='yay-do-hide' href="#alarms/hist"><%= texts.history %></a></li>
+                </ul>
+              </li>
+              <% } %> 
+             
+             <% if (recipeviews.length > 0) { %>
+                  <li>
+                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i> <%= texts.recipeviews %><span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                    <ul>
+                <% _.each(recipeviews, function(v){ %>
+                <li><a class='yay-do-hide' href="#recipe/<%= v.key %>"><%= v.name %></a></li>
+                <% }); %>
+                      </li>
+                    </ul>
+                  </li>
+                            <% } %>
+                            
+                            <% if (timelineviews.length > 0) { %>
+                                <li>
+                                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i> <%= texts.timelineviews %><span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                                    <ul>
+                    <% _.each(timelineviews, function(v){ %>
+                    <li><a class='yay-do-hide' href="#timeLine/<%= v.key %>"><%= v.name %></a></li>
+                    <% }); %>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <% } %>
+             
+              <% if (dlgviews.length > 0) { %>
+                  <li>
+                    <a class="yay-sub-toggle"><i class="fa fa-check-square-o"></i> <%= texts.datalogviews %><span class="yay-collapse-icon fa fa-angle-down"></span></a>
+                    <ul>
+                <% _.each(dlgviews, function(v){ %>
+                <li><a class='yay-do-hide' href="#dlgview/<%= v.key %>"><%= v.name %></a></li>
+                <% }); %>
+                      </li>
+                    </ul>
+                  </li>
+                  <% } %>
+                  
+              <% if (showDlg) { %>
+                <li>
+                  <a href="#dlg" title='<%= texts.dlg %>' class='yay-do-hide' style='display: inline-block; '><%= texts.dlg %></a>
+                </li>
+              <% } %>
+        
+              <% if(showUsrA) { %>
+              <li>
+                <a href="#usra" title='<%= texts.user_actions %>' class='yay-do-hide' style='display: inline-block; '><%= texts.user_actions %></a>
+              </li>
+              <% } %>
+              
+              <% if(showUsrEdit) { %>
+              <li>
+                <a href="#editusers" title='<%= texts.edit_users %>' class='yay-do-hide' style='display: inline-block; '><%= texts.edit_users %></a>
+              </li>
+              <% } %>
+        
+              <li>
+                <a href="#settings" title='<%= texts.settings2 %>' class='yay-do-hide' style='display: inline-block; '><%= texts.settings2 %></a>
+              </li>
+              
+              <li>
+                <a href="#" title='<%= login_img_title %>' class='menu_logged_icon menu_icon yay-do-hide' style='display: inline-block; '><img height='30' alt='<%= login_img_title %>' src='<%= login_img_src_black %>' /><span class="sr-only">(<%= login_img_title %>)</span></a>
+                <% if (show_settings) { %>
+                  <a href="settings/afterlogin.php" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img height='30' alt='<%= texts.settings %>' src='<%= settings_img_src_black %>' /><span class="sr-only">(<%= texts.settings %>)</span></a>
+                    <% } %>
+                    <% if (show_settings_panel) { %>
+                  <a onClick="window.open(window.location.protocol + '//' + window.location.host + window.location.pathname+'?settings=true','_self')" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img height='30' alt='<%= texts.settings %>' src='<%= settings_img_src_black %>' /><span class="sr-only">(<%= texts.settings %>)</span></a>
+                <% } %>
+                <% if (show_settings_desktop) { %>
+                  <a onClick="window.open(window.location.protocol + '//' + window.location.host + window.location.pathname+'?settings=true','_self')" title='<%= texts.settings %>' class='settings_icon' style='display: inline-block; padding: 7px; 5px 5px 5px; '><img height='30' alt='<%= texts.settings %>' src='<%= settings_img_src_black %>' /><span class="sr-only">(<%= texts.settings %>)</span></a>
+                <% } %>
+                </li>
+            </ul>
+                  
+                </ul>
+        </script>
+        <!-- /Yay Sidebar -->
+
+
+        <script id="trendTimeConfBarTemplate" type="text/template">
+            <table width='100%' style='height: 44px;' class='trendconfigtbl_normal bgGray2'>
+                    <tr>
+                        <td class='trend_showmode' width='50' style='cursor: pointer;' ><a title="<%= texts.history %>" class='trendconfig_historymode' onclick='return false;'><img src='<%= imgs.history %>' /></a><a class='trendconfig_onlinemode' title="<%= texts.online %>" onclick='return false;'><img src='<%= imgs.online %>' /></a></td>
+                        <td class='trend_starttime_time' style='cursor: pointer; text-align: left; ' width='280px'><span class='trendconfig_date' style='text-align: left;' ></span></td>
+                        <td class='trend_controls' width='170'>
+                            <a href="#" title="<%= texts.skip_to_start %>" onclick='return false;'><img class='trend_tostart' src='<%= imgs.skip_to_start %>' /></a>
+                            <a href="#" title="<%= texts.rewind %>" onclick='return false;'><img class='trend_moveleft' src='<%= imgs.rewind %>' /></a>
+                            <a href="#" title="<%= texts.play %>" class='trend_playbox' onclick='return false;'><img class='trend_play' src='<%= imgs.play %>' /></a>
+                            <a href="#" title="<%= texts.pause %>" class='trend_pausebox' onclick='return false;'><img class='trend_pause' src='<%= imgs.pause %>' /></a>
+                            <a href="#" title="<%= texts.fast_forward %>" onclick='return false;'><img class='trend_moveright' src='<%= imgs.fast_forward %>' /></a>
+                            <a href="#" title="<%= texts.skip_to_end %>" onclick='return false;'><img class='trend_toend' src='<%= imgs.skip_to_end %>' /></a>
+                        </td>
+                        <td style='padding-left: 20px; padding-right: 20px;' class='trendslider_box'><div class='trendslider'></div></td>
+                        <td width='100' style='cursor: pointer;' class='trendconfig_rangetext'></td>
+                    </tr>
+                    <tr>
+                    </tr>
+                </table>
+        
+                <table width='100%' style='height: 44px;' class='trendconfigtbl_small bgGray2'>
+                    <tr>
+                        <td class='trend_showmode' rowspan='2' width='50px' style='cursor: pointer;' ><a title="<%= texts.history %>" class='trendconfig_historymode' onclick='return false;'><img src='<%= imgs.history %>' /></a><a class='trendconfig_onlinemode' title="<%= texts.online %>" onclick='return false;'><img src='<%= imgs.online %>' /></a></td>
+                        <td class='trend_starttime_time' style='cursor: pointer; text-align: left; ' width='280px'><span class='trendconfig_date' style='text-align: left;' ></span></td>
+                        <td class='trend_controls' width='70'>
+                            <a href="#" title="<%= texts.rewind %>" onclick='return false;'><img class='trend_moveleft' src='<%= imgs.rewind %>' /></a>
+                            <a href="#" title="<%= texts.fast_forward %>" onclick='return false;'><img class='trend_moveright' src='<%= imgs.fast_forward %>' /></a>
+                        </td>
+                        <td style='padding-left: 20px; padding-right: 20px;' class='trendslider_box'><div class='trendslider'></div></td>
+                        <td width='80' style='cursor: pointer; text-align: left; ' class='trendconfig_rangetext'></td>
+                    </tr>
+                </table>
+                
+                <table width='100%' style='height: 44px;' class='trendconfigtbl_tiny bgGray2'>
+                    <tr>
+                        <td class='trend_showmode' rowspan='2' width='50px' style='cursor: pointer;' ><a title="<%= texts.history %>" class='trendconfig_historymode' onclick='return false;'><img src='<%= imgs.history %>' /></a><a class='trendconfig_onlinemode' title="<%= texts.online %>" onclick='return false;'><img src='<%= imgs.online %>' /></a></td>
+                        <td class='trend_starttime_time_short' style='cursor: pointer; text-align: left; ' width='200px'><span class='trendconfig_date_short' style='text-align: left;' ></span></td>
+                        <td class='trend_controls' width='70'>
+                            <a href="#" title="<%= texts.rewind %>" onclick='return false;'><img class='trend_moveleft' src='<%= imgs.rewind %>' /></a>
+                            <a href="#" title="<%= texts.fast_forward %>" onclick='return false;'><img class='trend_moveright' src='<%= imgs.fast_forward %>' /></a>
+                        </td>
+                        <td style='padding-left: 20px; padding-right: 20px;' class='trendslider_box onlyonline'><div class='trendslider'></div></td>
+                        <td width='80' style='cursor: pointer; text-align: left; ' class='trendconfig_rangetext onlyonline'></td>
+                    </tr>
+                </table>
+        </script>
+
+        <div class="yaybar yay-overlay yay-light yay-gestures yay-hide visible-xs bgGray1">
+            <div class="nano has-scrollbar">
+                <div class="nano-content" id="mynav-left" style="width: 728px; right: -15px;" tabindex="0"></div>
+                <div class="nano-pane" style="display: none;">
+                    <div class="nano-slider" style="height: 292px; transform: translate(0px, 0px);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mynav" style="width: 728px;"></div>
+
+        <div id="container">
+            <div id="svg">
+                <div id="visuiframe" class="bgWhite">
+                    <div id="visuiframe_core" style="width: 728px; height: 345px;">
+                        <div class="mySVG" style="overflow: hidden; width: 728px; height: 345px;">
+                            <div style="position: absolute; z-index: 999;"></div>
+                            <div class="zoomEl"></div><iframe frameborder="0"
+                                style="background-color: rgb(80, 82, 102); width: 728px; height: 345px;">
+                                <html>
+
+                                <head>
+                                    <meta charset="utf-8">
+                                    <meta name="viewport"
+                                        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+                                    <meta name="msapplication-tap-highlight" content="no" />
+                                </head>
+
+                                <body></body>
+
+                                </html>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+                <div id="connection_lost" class="err lostConnectionDialog"
+                    style="position: absolute; display: none; top: 100px; left: 312px;">Lost connection with
+                    communication module</div>
+            </div>
+        </div>
+
+        <script src="scripts/libs/jquery.js"></script>
+        <script src="bootstrap/bootstrap.min.js"></script>
+        <script src="bootstrap/bootstrap-dialog.js"></script>
+
+
+    </body>
+
+</body>
