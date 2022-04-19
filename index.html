@@ -4,9 +4,22 @@
 
 <head>
     <title>F23</title>
+    <style>
+        .darkmode {
+            background-color: black;
+            color: white;
+        }
+    </style>
+    <script>
+        function darkMode() {
+            var element = document.body;
+            element.className = "dark-mode";
+        }
+    </script>
 </head>
 
 <body>
+    <button onclick="darkMode()">Try me</button>
     <iframe
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTG8cUyuOD7o1aAmHXv8482EqvWOz3iHN_E9OaYqizCPQY7HNkii3CHmby99zt5NTjUzgzVScKGFX7j/pubhtml?gid=1085959912&range=A1:U19&amp;single=true&amp;widget=false&amp;headers=false"
         width="100%" height="1200"></iframe>
