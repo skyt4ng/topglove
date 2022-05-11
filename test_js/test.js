@@ -5,7 +5,8 @@ function testing123 (abd,tuv){
 while (abd<=50){
     abd=abc+def+tuv
 }
-alert("this is done"+abc)
+alert("this is done"+abc);
+return abd;
 }
 
-var testing123 (0,1)
+var result = testing123 (0,1);
